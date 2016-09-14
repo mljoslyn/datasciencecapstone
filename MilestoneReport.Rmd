@@ -1,0 +1,260 @@
+---
+title: "Coursera Data Science Capstone Milestone Report"
+author: "Michael Joslyn"
+date: "September 3, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Summary
+The Coursera Data Sciene Capstone project is to use data science techniques to develop a predictive model for language processing. This milestone report is to show demonstrate exploratory analysis and plan for the rest of the project.  The data to be used is from a corpus called HC Corpora - 
+[Capstone Data](https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip).  It consists of corpus in four languages from three sources: blogs, news and twitter feeds.
+
+## Setup Environment
+
+```{r,message=FALSE}
+require(tm)
+require(ggplot2)
+require(wordcloud)
+require(RWeka)
+require(RColorBrewer)
+require(parallel)
+
+#Preparing the parallel cluster using the cores
+cl <- makeCluster(detectCores())
+invisible(clusterEvalQ(cl, library(tm)))
+invisible(clusterEvalQ(cl, library(RWeka)))
+options(mc.cores=1)
+```
+
+## Loading the Data
+The sample data used for this exploratory analysis will come from the three sets of corpa - blogs, news and twitter.  Only the first 20000 lines of each will be taken.  It will need to be seen if this is sufficient a sample and how well it representd the data as a whole. 
+
+```{r,echo=FALSE}
+setwd("/media/mike/Extra Drive 1/GIT/Capstone/")
+```
+
+```{r,echo=FALSE}
+sampleFile <- function(rawFileName, sampleFileName ) {
+
+con1 <- file(rawFileName, "r")
+con2 <- file(sampleFileName)
+while (length(text <- readLines(rawFileName, 1, encoding = "UTF-8", skipNul = TRUE)) > 0) {
+  if (rbinom(1,1,0.1) == 1)
+    cat(text,file=con2)
+}
+close(con1)
+close(con2)
+
+}
+```
+### Basic File Information
+
+The following is a count of the file sizes:
+```{r}
+system("ls -sh ./final/en_US/*")
+```
+201M ./final/en_US/en_US.blogs.txt   
+197M ./final/en_US/en_US.news.txt     
+160M ./final/en_US/en_US.twitter.txt    
+
+Line counts:
+```{r}
+system("wc -l ./final/en_US/*")
+```
+   899288 ./final/en_US/en_US.blogs.txt    
+  1010242 ./final/en_US/en_US.news.txt    
+  2360148 ./final/en_US/en_US.twitter.txt   
+  4269678 total   
+
+Word counts:
+```{r}
+system("wc -w ./final/en_US/*")
+```
+ 37334114 ./final/en_US/en_US.blogs.txt   
+ 34365936 ./final/en_US/en_US.news.txt    
+ 30359804 ./final/en_US/en_US.twitter.txt   
+ 102059854 total    
+
+Loading the sample data (first 20000 lines of each file):
+```{r}
+con <- file("final/en_US/en_US.blogs.txt", "r")
+blogs <- readLines("final/en_US/en_US.blogs.txt", 20000, encoding = "UTF-8", skipNul = TRUE)
+close(con)
+con <- file("final/en_US/en_US.news.txt", "r")
+news <- readLines("final/en_US/en_US.news.txt", 20000, encoding = "UTF-8", skipNul = TRUE)
+close(con)
+con <- file("final/en_US/en_US.twitter.txt", "r")
+twitter <- readLines("final/en_US/en_US.twitter.txt", 20000, encoding = "UTF-8", skipNul = TRUE)
+close(con)
+
+alldocs <- paste(blogs, news, twitter)
+
+rm(blogs)
+rm(news)
+rm(twitter)
+
+corpus <- Corpus(VectorSource(alldocs))
+rm(alldocs)
+```
+
+## Clean the data
+
+The text data will contain many variations in capitalization as well as punctiation and whitespace between words.  Also, we are only concerned with words, not numbers.
+
+```{r}
+corpus <- tm_map(corpus, content_transformer(tolower))
+corpus <- tm_map(corpus, stripWhitespace)
+corpus <- tm_map(corpus, removePunctuation)
+corpus <- tm_map(corpus, removeNumbers)
+```
+
+## Form Ngram token matrices
+
+Now that we have cleaned the data it can be run through the Weka tokenizer to build a matrix of the words and word combinations along with their frequncies.
+
+```{r}
+UniGramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 1, max = 1))
+BiGramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 2, max = 2))
+TriGramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 3, max = 3))
+QuadGramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 4, max = 4))
+```
+
+```{r tdmchunk, cache=TRUE}
+# Create document matrices using tokenizers
+
+UniGramTdm <- TermDocumentMatrix(corpus, control = list(tokenize = UniGramTokenizer))
+BiGramTdm  <- TermDocumentMatrix(corpus, control = list(tokenize = BiGramTokenizer))
+TriGramTdm <- TermDocumentMatrix(corpus, control = list(tokenize = TriGramTokenizer))
+QuadGramTdm <- TermDocumentMatrix(corpus, control = list(tokenize = QuadGramTokenizer))
+```
+
+```{r}
+# Get the frequncies and put them in decreasing order
+freq.unigram <- slam::row_sums(UniGramTdm)
+freq.bigram  <- slam::row_sums(BiGramTdm)
+freq.trigram <- slam::row_sums(TriGramTdm)
+freq.quadgram <- slam::row_sums(QuadGramTdm)
+
+freq.unigram <- sort(freq.unigram, decreasing = TRUE)
+freq.bigram  <- sort(freq.bigram, decreasing = TRUE)
+freq.trigram <- sort(freq.trigram, decreasing = TRUE)
+freq.quadgram <- sort(freq.quadgram, decreasing = TRUE)
+
+# Create Data frames with the top 40 items in each document matrix
+frequencydf.unigram <- data.frame("Term"=names(head(freq.unigram,40)), "Frequency"=head(freq.unigram,40))
+frequencydf.bigram  <- data.frame("Term"=names(head(freq.bigram,40)), "Frequency"=head(freq.bigram,40))
+frequencydf.trigram <- data.frame("Term"=names(head(freq.trigram,40)), "Frequency"=head(freq.trigram,40))
+frequencydf.quadgram <- data.frame("Term"=names(head(freq.quadgram,40)), "Frequency"=head(freq.quadgram,40))
+
+# Reorder the data frame level for plotting purposes
+frequencydf.unigram$TermOrdered <- reorder(frequencydf.unigram$Term, frequencydf.unigram$Frequency)
+frequencydf.bigram$TermOrdered  <- reorder(frequencydf.bigram$Term, frequencydf.bigram$Frequency)
+frequencydf.trigram$TermOrdered <- reorder(frequencydf.trigram$Term, frequencydf.trigram$Frequency)
+frequencydf.quadgram$TermOrdered <- reorder(frequencydf.quadgram$Term, frequencydf.quadgram$Frequency)
+
+```
+
+## Uni-, Bi-, Tri-, and Quad-gram Frequency Plots
+
+Now that we have collected the information on the frequencies, let's see it visually.  Using ggplot and the ordered frequencies gathered above, the top 40 occurances are plotted below.
+
+```{r, echo=FALSE}
+p1 <-
+ggplot(frequencydf.unigram, aes(x = TermOrdered, y = Frequency)) +
+  geom_bar(stat = "identity", color="gray55", fill="blue") +
+  geom_text(data=frequencydf.unigram,aes(x=TermOrdered,y=-2000,label=Frequency),vjust=0, size=3) +
+  xlab("Word") + ylab("Count") + ggtitle("Uni-Gram Frequency (top 40)") +
+  theme(plot.title = element_text(lineheight=.8, face="bold")) +
+  coord_flip()
+p1
+```
+
+```{r, echo=FALSE}
+p2 <-
+ggplot(frequencydf.bigram, aes(x = TermOrdered, y = Frequency)) +
+  geom_bar(stat = "identity", color="gray55", fill="yellow") +
+  geom_text(data=frequencydf.bigram,aes(x=TermOrdered,y=-250,label=Frequency),vjust=0, size=3) +
+  xlab("Bi-Grams") + ylab("Count") + ggtitle("Bi-Gram Frequency (top 40)") +
+  theme(plot.title = element_text(lineheight=.8, face="bold")) +
+  coord_flip()
+p2
+```
+
+```{r, echo=FALSE}
+p3 <-
+ggplot(frequencydf.trigram, aes(x = TermOrdered, y = Frequency)) +
+  geom_bar(stat = "identity", color="gray55", fill="red") +
+  geom_text(data=frequencydf.trigram,aes(x=TermOrdered,y=-25,label=Frequency),vjust=0, size=3) +
+  xlab("Tri-Grams") + ylab("Count") + ggtitle("Tri-Gram Frequency (top 40)") +
+  theme(plot.title = element_text(lineheight=.8, face="bold")) +
+  coord_flip()
+p3
+
+```
+
+```{r, echo=FALSE}
+p4 <-
+ggplot(frequencydf.quadgram, aes(x = TermOrdered, y = Frequency)) +
+  geom_bar(stat = "identity", color="gray55", fill="violet") +
+  geom_text(data=frequencydf.quadgram,aes(x=TermOrdered,y=-10,label=Frequency),vjust=0, size=3) +
+  xlab("Quad-Grams") + ylab("Count") + ggtitle("Quad-Gram Frequency (top 40)") +
+  theme(plot.title = element_text(lineheight=.8, face="bold")) +
+  coord_flip()
+p4
+
+```
+
+Many of the results are as expected.  Looking at the quad-gram results is where some interesting combinations that appear in the top 40.  Are some of these just due to the sample data or will this hold in out-of-sample testing?
+
+Another concern will be the size of the tri and quad gram matrices and how an effective and practical model can be built.
+
+## Word Cloud
+
+Another look at the results in word cloud plots.
+
+```{r,echo=FALSE,warning=FALSE,error=FALSE,message=FALSE}
+# Generate word clouds
+par(mfrow=c(2,2))
+wordcloud(words = frequencydf.unigram$TermOrdered,
+          freq = frequencydf.unigram$Frequency,
+          random.order=FALSE,
+          rot.per=0.35,
+          use.r.layout=FALSE,
+          colors=brewer.pal(8, "Dark2"))
+
+text(x=0.5, y=1.1, "UniGram Word Cloud")
+
+wordcloud(words = frequencydf.bigram$TermOrdered,
+          freq = frequencydf.bigram$Frequency,
+          random.order=FALSE,
+          rot.per=0.35,
+          use.r.layout=FALSE,
+          colors=brewer.pal(8, "Dark2"))
+text(x=0.5, y=1.1, "BiGram Word Cloud")
+
+wordcloud(words = frequencydf.trigram$TermOrdered,
+          freq = frequencydf.trigram$Frequency,
+          random.order=FALSE,
+          rot.per=0.35,
+          use.r.layout=FALSE,
+         colors=brewer.pal(8, "Dark2"))
+text(x=0.5, y=1.1, "TriGram Word Cloud")
+
+wordcloud(words = frequencydf.quadgram$TermOrdered,
+          freq = frequencydf.quadgram$Frequency,
+          random.order=FALSE,
+          rot.per=0.35,
+          use.r.layout=FALSE,
+          colors=brewer.pal(8, "Dark2"))
+text(x=0.5, y=1.1, "QuadGram Word Cloud")
+
+```
+
+
+## Summary and Next Steps
+
+This report shows the progress made in exploring the data in preperation for the next phase of the project.  We have cleaned the data, explored the size and contents, and formed the data into Ngram dataframes.  The next steps will be to develop a model that can use these dataframes to predict the next word from user input.  We will need to think about how to make the model perform in a practical manner (in both time and memory usage).  Also, we will need to handle the cases where new words are used that were not in our original data source.  
