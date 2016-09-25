@@ -1,0 +1,24 @@
+preface,word,1-grams, cnt
+,.,.,2
+,2nd-tallest,2nd-tallest,1
+,555,555,1
+,:,:,1
+,</s>,</s>,3
+,<s>,<s>,0
+,California,California,1
+,Francisco,Francisco,3
+,Pyramid,Pyramid,1
+,San,San,3
+,Street,Street,1
+,The,The,1
+,This,This,1
+,Transamerica,Transamerica,1
+,a,a,1
+,building,building,2
+,buildings,buildings,1
+,in,in,3
+,is,is,3
+,list,list,1
+,tallest,tallest,2
+,the,the,3
+,containing,containing,1

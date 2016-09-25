@@ -1,0 +1,27 @@
+preface,word,5-gram,cnt
+2nd-tallest building in San ,Francisco,2nd-tallest building in San Francisco,1
+555 California Street is ,the,555 California Street is the,1
+<s> 555 California Street ,is,<s> 555 California Street is,1
+<s> The Transamerica Pyramid ,is,<s> The Transamerica Pyramid is,1
+<s> This is a ,list,<s> This is a list,1
+California Street is the ,2nd-tallest,California Street is the 2nd-tallest,1
+Pyramid is the tallest ,building,Pyramid is the tallest building,1
+Street is the 2nd-tallest ,building,Street is the 2nd-tallest building,1
+The Transamerica Pyramid is ,the,The Transamerica Pyramid is the,1
+This is a list ,containing,This is a list containing,1
+Transamerica Pyramid is the ,tallest,Transamerica Pyramid is the tallest,1
+a list containing the ,tallest,a list containing the tallest,1
+building in San Francisco ,.,building in San Francisco .,2
+buildings in San Francisco ,:,buildings in San Francisco :,1
+in San Francisco . ,</s>,in San Francisco . </s>,2
+in San Francisco : ,</s>,in San Francisco : </s>,1
+is a list containing ,the,is a list containing the,1
+is the 2nd-tallest building ,in,is the 2nd-tallest building in,1
+is the tallest building ,in,is the tallest building in,1
+list containing the tallest ,buildings,list containing the tallest buildings,1
+tallest building in San ,Francisco,tallest building in San Francisco,1
+tallest buildings in San ,Francisco,tallest buildings in San Francisco,1
+the 2nd-tallest building in ,San,the 2nd-tallest building in San,1
+the tallest building in ,San,the tallest building in San,1
+the tallest buildings in ,San,the tallest buildings in San,1
+containing the tallest buildings ,in,containing the tallest buildings in,1
