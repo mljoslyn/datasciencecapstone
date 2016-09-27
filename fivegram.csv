@@ -1,4 +1,4 @@
-preface,word,5-gram,cnt
+preface,word,ngram,cnt
 2nd-tallest building in San ,Francisco,2nd-tallest building in San Francisco,1
 555 California Street is ,the,555 California Street is the,1
 <s> 555 California Street ,is,<s> 555 California Street is,1

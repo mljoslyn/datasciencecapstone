@@ -1,4 +1,4 @@
-preface,word,2-gram,cnt
+preface,word,ngram,cnt
 .,</s>,. </s>,2
 2nd-tallest,building,2nd-tallest building,1
 555,California,555 California,1

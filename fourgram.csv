@@ -1,29 +1,29 @@
-preface,word,4-gram,cnt
-2nd-tallest building in ,San,2nd-tallest building in San,1
-555 California Street ,is,555 California Street is,1
-<s> 555 California ,Street,<s> 555 California Street,1
-<s> The Transamerica ,Pyramid,<s> The Transamerica Pyramid,1
-<s> This is ,a,<s> This is a,1
-California Street is ,the,California Street is the,1
-Pyramid is the ,tallest,Pyramid is the tallest,1
-San Francisco . ,</s>,San Francisco . </s>,2
-San Francisco : ,</s>,San Francisco : </s>,1
-Street is the ,2nd-tallest,Street is the 2nd-tallest,1
-The Transamerica Pyramid ,is,The Transamerica Pyramid is,1
-This is a ,list,This is a list,1
-Transamerica Pyramid is ,the,Transamerica Pyramid is the,1
-a list containing ,the,a list containing the,1
-building in San ,Francisco,building in San Francisco,2
-buildings in San ,Francisco,buildings in San Francisco,1
-in San Francisco ,.,in San Francisco .,2
-in San Francisco ,:,in San Francisco :,1
-is a list ,containing,is a list containing,1
-is the 2nd-tallest ,building,is the 2nd-tallest building,1
-is the tallest ,building,is the tallest building,1
-list containing the ,tallest,list containing the tallest,1
-tallest building in ,San,tallest building in San,1
-tallest buildings in ,San,tallest buildings in San,1
-the 2nd-tallest building ,in,the 2nd-tallest building in,1
-the tallest building ,in,the tallest building in,1
-the tallest buildings ,in,the tallest buildings in,1
-containing the tallest ,buildings,containing the tallest buildings,1
+preface,word,ngram,cnt
+2nd-tallest building in,San,2nd-tallest building in San,1
+555 California Street,is,555 California Street is,1
+<s> 555 California,Street,<s> 555 California Street,1
+<s> The Transamerica,Pyramid,<s> The Transamerica Pyramid,1
+<s> This is,a,<s> This is a,1
+California Street is,the,California Street is the,1
+Pyramid is the,tallest,Pyramid is the tallest,1
+San Francisco .,</s>,San Francisco . </s>,2
+San Francisco :,</s>,San Francisco : </s>,1
+Street is the,2nd-tallest,Street is the 2nd-tallest,1
+The Transamerica Pyramid,is,The Transamerica Pyramid is,1
+This is a,list,This is a list,1
+Transamerica Pyramid is,the,Transamerica Pyramid is the,1
+a list containing,the,a list containing the,1
+building in San,Francisco,building in San Francisco,2
+buildings in San,Francisco,buildings in San Francisco,1
+in San Francisco,.,in San Francisco .,2
+in San Francisco,:,in San Francisco :,1
+is a list,containing,is a list containing,1
+is the 2nd-tallest,building,is the 2nd-tallest building,1
+is the tallest,building,is the tallest building,1
+list containing the,tallest,list containing the tallest,1
+tallest building in,San,tallest building in San,1
+tallest buildings in,San,tallest buildings in San,1
+the 2nd-tallest building,in,the 2nd-tallest building in,1
+the tallest building,in,the tallest building in,1
+the tallest buildings,in,the tallest buildings in,1
+containing the tallest,buildings,containing the tallest buildings,1

@@ -1,4 +1,4 @@
-preface,word,3-gram,cnt
+preface,word,ngram,cnt
 2nd-tallest building,in,2nd-tallest building in,1
 555 California,Street,555 California Street,1
 <s> 555,California,<s> 555 California,1

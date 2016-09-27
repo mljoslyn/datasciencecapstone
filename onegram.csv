@@ -1,4 +1,4 @@
-preface,word,1-grams, cnt
+preface,word,ngram, cnt
 ,.,.,2
 ,2nd-tallest,2nd-tallest,1
 ,555,555,1
